@@ -62,8 +62,19 @@ const KartuFoto = ({ data }: { data: ObjekGambar }) => {
 
     // Toggle (mengganti) antara gambar utama dan fallback
     setPakaiFallback(prev => !prev);
-    // Toggle (mengganti) faktor pembesaran: dari 1 menjadi 1.15, atau sebaliknya
-    setPerbesar(prev => (prev === 1 ? 1.15 : 1));
+
+    // Penskalaan gambar:
+    // Jika skala saat ini 1, ubah menjadi 1.2.
+    // Jika skala saat ini 1.2, kembalikan ke 1.
+    // Jika skala saat ini sudah lebih besar dari 1.2 (misal karena diklik berkali-kali),
+    // maka kembalikan ke 1.
+    setPerbesar(prev => {
+      if (prev === 1) {
+        return 1.2; // Skala menjadi 1.2x saat pertama kali diklik
+      } else {
+        return 1; // Kembali ke skala normal saat diklik lagi
+      }
+    });
   };
 
   return (
@@ -95,8 +106,29 @@ export default function SusunanFoto() {
   // Mendapatkan lebar layar perangkat
   const layarLebar = Dimensions.get('window').width;
   // Menghitung ukuran setiap foto agar seragam dan pas di layar (3 kolom)
-  // 12 * 4 = 24 (margin horizontal total untuk 3 kolom, 6px kiri dan kanan per item)
-  const ukuranFoto = (layarLebar - 6 * 4) / 3; // (lebar layar - (marginHorizontal * 2 * jumlah_kolom)) / jumlah_kolom
+  // Total margin horizontal yang perlu dipertimbangkan:
+  // Ada 3 kolom. Setiap kolom memiliki marginHorizontal: 6.
+  // Jadi, ada 2 margin di antara kolom (6px * 2) dan 2 margin di sisi paling kiri dan paling kanan (6px * 2).
+  // Total margin = (6 * 2) + (6 * 2) = 12 + 12 = 24.
+  // Atau lebih sederhana: 6px di kiri item pertama, 6px di kanan item pertama,
+  // 6px di kiri item kedua, 6px di kanan item kedua,
+  // 6px di kiri item ketiga, 6px di kanan item ketiga.
+  // Total 6 * 2 * 3 = 36px.
+  // Namun, marginHorizontal: 6 pada `peti` berarti 6px kiri dan 6px kanan.
+  // Jadi untuk 3 item, ada 6 margin (3 kiri, 3 kanan), total 6 * 6 = 36.
+  // Jika kita ingin 3 kolom pas, kita perlu memperhitungkan 2 margin antar kolom dan 2 margin luar.
+  // (6px kiri item 1) + (6px kanan item 1 + 6px kiri item 2) + (6px kanan item 2 + 6px kiri item 3) + (6px kanan item 3)
+  // = 6 + 12 + 12 + 6 = 36.
+  // Jadi, (layarLebar - (margin total)) / 3.
+  // Margin total untuk 3 kolom dengan marginHorizontal: 6 adalah 6 (kiri luar) + 6 (kanan item 1) + 6 (kiri item 2) + 6 (kanan item 2) + 6 (kiri item 3) + 6 (kanan luar) = 36.
+  // Atau, jika marginHorizontal diterapkan ke setiap item, itu berarti 6px di kiri dan 6px di kanan setiap item.
+  // Untuk 3 item, ada 3 * 2 * 6 = 36px total margin yang akan memakan ruang.
+  // Mari kita hitung ulang untuk memastikan grid 3x3 yang rapi.
+  // Jika setiap 'peti' memiliki marginHorizontal: 6, maka ada total 6px kiri dan 6px kanan.
+  // Untuk 3 kolom, ada 3 peti. Jadi total margin horizontal yang akan memakan ruang adalah 3 * (6 + 6) = 3 * 12 = 36px.
+  // Maka, ukuranFoto = (layarLebar - 36) / 3.
+  const totalMarginHorizontal = 6 * 2 * 3; // 6px (kiri+kanan) * 2 sisi * 3 item
+  const ukuranFoto = (layarLebar - totalMarginHorizontal) / 3;
 
   // Fungsi untuk memotong array menjadi baris-baris berisi 3 item
   const potongBaris = (array: ObjekGambar[], awal: number) => array.slice(awal, awal + 3);
@@ -136,6 +168,11 @@ const gayaKartu = StyleSheet.create({
   },
   lajur: {
     flexDirection: 'row', // Tata letak horizontal untuk item dalam baris
+    // Menggunakan justifyContent: 'space-around' atau 'space-between'
+    // bersama dengan marginHorizontal pada 'peti' untuk distribusi yang lebih baik.
+    // Atau, jika margin pada peti sudah dihitung dalam ukuranFoto,
+    // maka cukup pastikan tidak ada padding/margin tambahan di sini yang mengganggu.
+    // Jika ukuranFoto sudah memperhitungkan margin, maka lajur tidak perlu margin tambahan.
     marginBottom: 14, // Margin bawah untuk setiap baris
   },
   peti: {
