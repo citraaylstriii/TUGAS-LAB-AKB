@@ -102,7 +102,7 @@ const ImageCell = ({ imageData }: { imageData: ImageData }) => {
           // Callback jika terjadi kesalahan saat memuat gambar
           onError={() => setLoadError(true)}
           // Menerapkan gaya gambar, termasuk transformasi skala
-          style={[appStyles.responsiveImage, { transform: [{ scale: currentScale }] }]}
+          style={[appStyles.responsiveImage, { transform: [{ scale: currentScale }] }] }
           resizeMode="cover" // Memastikan gambar mengisi area tanpa distorsi
         />
       )}
@@ -117,12 +117,6 @@ export default function VisualGallery() {
 
   // Menghitung ukuran setiap sel gambar agar membentuk grid 3x3 yang seragam.
   // Setiap sel memiliki margin 6px di setiap sisi (atas, bawah, kiri, kanan).
-  // Untuk 3 kolom, total margin horizontal yang memakan ruang adalah:
-  // (margin kiri item 1) + (margin kanan item 1) +
-  // (margin kiri item 2) + (margin kanan item 2) +
-  // (margin kiri item 3) + (margin kanan item 3)
-  // Total = 6 + 6 + 6 + 6 + 6 + 6 = 36px.
-  // Maka, lebar yang tersedia untuk 3 gambar adalah lebar perangkat dikurangi total margin.
   const totalHorizontalMargin = 6 * 2 * 3; // 6px (left+right) * 2 sides * 3 items
   const cellSize = (deviceWidth - totalHorizontalMargin) / 3;
 
