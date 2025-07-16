@@ -1,53 +1,88 @@
 import React, { useState } from 'react';
 import { View, Image, TouchableOpacity, SafeAreaView, ScrollView, Dimensions, Text, StyleSheet } from 'react-native';
 
+// Array sumber foto utama
 const SUMBER_FOTO = [
-  'https://images.pexels.com/photos/17685535/pexels-photo-17685535.jpeg',
-  'https://images.pexels.com/photos/322311/pexels-photo-322311.jpeg',
-  'https://images.pexels.com/photos/17685539/pexels-photo-17685539.jpeg',
-  'https://images.pexels.com/photos/19453661/pexels-photo-19453661.jpeg',
-  'https://images.pexels.com/photos/19453660/pexels-photo-19453660.jpeg',
-  'https://images.pexels.com/photos/16959472/pexels-photo-16959472.jpeg',
-  'https://images.pexels.com/photos/26791472/pexels-photo-26791472.jpeg',
-  'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg', // Tambahan gambar ke-8
-  'https://images.pexels.com/photos/34950/pexels-photo.jpg', // Tambahan gambar ke-9
+  'https://images.pexels.com/photos/17685535/pexels-photo-17685535.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  'https://images.pexels.com/photos/322311/pexels-photo-322311.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  'https://images.pexels.com/photos/17685539/pexels-photo-17685539.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  'https://images.pexels.com/photos/19453661/pexels-photo-19453661.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  'https://images.pexels.com/photos/19453660/pexels-photo-19453660.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  'https://images.pexels.com/photos/16959472/pexels-photo-16959472.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  'https://images.pexels.com/photos/26791472/pexels-photo-26791472.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  'https://images.pexels.com/photos/34950/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
 ];
 
+// Array sumber foto alternatif (fallback)
+const FALLBACK_FOTO = [
+  'https://images.pexels.com/photos/189349/pexels-photo-189349.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  'https://images.pexels.com/photos/302804/pexels-photo-302804.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  'https://images.pexels.com/photos/1402787/pexels-photo-1402787.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  'https://images.pexels.com/photos/1031332/pexels-photo-1031332.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  'https://images.pexels.com/photos/1563356/pexels-photo-1563356.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  'https://images.pexels.com/photos/209677/pexels-photo-209677.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  'https://images.pexels.com/photos/1005417/pexels-photo-1005417.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  'https://images.pexels.com/photos/1020317/pexels-photo-1020317.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  'https://images.pexels.com/photos/104827/cat-pet-animal-domestic-pexels-photo.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+];
+
+// Menggabungkan sumber foto utama dan fallback ke dalam satu array objek
 const KUMPULAN = SUMBER_FOTO.map((tautan, i) => ({
-  kode: i + 1,
-  utama: tautan,
-  fallback: tautan,
+  kode: i + 1, // ID unik untuk setiap gambar
+  utama: tautan, // URL gambar utama
+  // Menggunakan gambar fallback yang berbeda untuk setiap gambar utama.
+  // Jika tidak ada fallback spesifik pada indeks tersebut, gunakan gambar utama sebagai fallback.
+  fallback: FALLBACK_FOTO[i] || tautan,
 }));
 
+// Tipe data untuk objek gambar
 type ObjekGambar = {
   kode: number;
   utama: string;
   fallback: string;
 };
 
+// Komponen KartuFoto untuk menampilkan setiap gambar
 const KartuFoto = ({ data }: { data: ObjekGambar }) => {
+  // State untuk menentukan apakah menggunakan gambar fallback atau utama
   const [pakaiFallback, setPakaiFallback] = useState(false);
+  // State untuk faktor pembesaran gambar
   const [perbesar, setPerbesar] = useState(1);
+  // State untuk menangani jika gambar gagal dimuat
   const [tidakTerload, setTidakTerload] = useState(false);
 
-  const ketikaTekan = () => {
-    if (tidakTerload) return;
-    setPakaiFallback(prev => !prev);
-    setPerbesar(prev => Math.min(prev * 1.15, 2));
-  };
-
+  // URL gambar yang aktif, beralih antara utama dan fallback
   const aktifUrl = pakaiFallback ? data.fallback : data.utama;
+
+  // Fungsi yang dipanggil saat kartu gambar diklik
+  const ketikaTekan = () => {
+    // Jika gambar gagal dimuat, jangan lakukan apa-apa
+    if (tidakTerload) return;
+
+    // Toggle (mengganti) antara gambar utama dan fallback
+    setPakaiFallback(prev => !prev);
+    // Toggle (mengganti) faktor pembesaran: dari 1 menjadi 1.15, atau sebaliknya
+    setPerbesar(prev => (prev === 1 ? 1.15 : 1));
+  };
 
   return (
     <TouchableOpacity onPress={ketikaTekan} style={gayaKartu.kotak}>
       {tidakTerload ? (
+        // Tampilan jika gambar gagal dimuat
         <View style={gayaKartu.blokError}>
           <Text style={gayaKartu.teks}>Gagal Tampil</Text>
         </View>
       ) : (
+        // Tampilan gambar utama
         <Image
+          // Menggunakan 'key' prop untuk memaksa React me-render ulang komponen Image
+          // setiap kali 'aktifUrl' berubah, memastikan gambar baru dimuat.
+          key={aktifUrl}
           source={{ uri: aktifUrl }}
+          // Fungsi yang dipanggil jika terjadi error saat memuat gambar
           onError={() => setTidakTerload(true)}
+          // Menerapkan gaya gambar, termasuk transformasi skala
           style={[gayaKartu.img, { transform: [{ scale: perbesar }] }]}
         />
       )}
@@ -55,19 +90,30 @@ const KartuFoto = ({ data }: { data: ObjekGambar }) => {
   );
 };
 
+// Komponen utama untuk menampilkan susunan foto
 export default function SusunanFoto() {
+  // Mendapatkan lebar layar perangkat
   const layarLebar = Dimensions.get('window').width;
-  const ukuranFoto = layarLebar / 3 - 12;
+  // Menghitung ukuran setiap foto agar seragam dan pas di layar (3 kolom)
+  // 12 * 4 = 24 (margin horizontal total untuk 3 kolom, 6px kiri dan kanan per item)
+  const ukuranFoto = (layarLebar - 6 * 4) / 3; // (lebar layar - (marginHorizontal * 2 * jumlah_kolom)) / jumlah_kolom
 
+  // Fungsi untuk memotong array menjadi baris-baris berisi 3 item
   const potongBaris = (array: ObjekGambar[], awal: number) => array.slice(awal, awal + 3);
 
   return (
     <SafeAreaView style={gayaKartu.root}>
       <ScrollView contentContainerStyle={gayaKartu.scroll}>
+        {/* Mengulang untuk membuat baris-baris gambar (indeks 0, 3, 6) */}
         {[0, 3, 6].map(barisIndex => (
           <View key={barisIndex} style={gayaKartu.lajur}>
+            {/* Mengulang untuk menampilkan setiap KartuFoto dalam baris */}
             {potongBaris(KUMPULAN, barisIndex).map(item => (
-              <View key={item.kode} style={[gayaKartu.peti, { width: ukuranFoto, height: ukuranFoto }]}>
+              <View
+                key={item.kode}
+                // Menerapkan ukuran yang seragam untuk setiap peti gambar
+                style={[gayaKartu.peti, { width: ukuranFoto, height: ukuranFoto }]}
+              >
                 <KartuFoto data={item} />
               </View>
             ))}
@@ -78,44 +124,45 @@ export default function SusunanFoto() {
   );
 }
 
+// Objek StyleSheet untuk mendefinisikan gaya-gaya komponen
 const gayaKartu = StyleSheet.create({
   root: {
-    flex: 1,
-    backgroundColor: '#121212',
+    flex: 1, // Mengisi seluruh ruang yang tersedia
+    backgroundColor: '#121212', // Warna latar belakang gelap
   },
   scroll: {
-    paddingVertical: 18,
-    alignItems: 'center',
+    paddingVertical: 18, // Padding vertikal untuk konten scroll
+    alignItems: 'center', // Pusatkan item secara horizontal
   },
   lajur: {
-    flexDirection: 'row',
-    marginBottom: 14,
+    flexDirection: 'row', // Tata letak horizontal untuk item dalam baris
+    marginBottom: 14, // Margin bawah untuk setiap baris
   },
   peti: {
-    marginHorizontal: 6,
+    marginHorizontal: 6, // Margin horizontal untuk jarak antar sel gambar
   },
   kotak: {
-    flex: 1,
-    aspectRatio: 1,
-    backgroundColor: '#292929',
-    borderRadius: 12,
-    overflow: 'hidden',
+    flex: 1, // Mengisi seluruh ruang dalam peti
+    aspectRatio: 1, // Memastikan kotak tetap berbentuk persegi
+    backgroundColor: '#292929', // Warna latar belakang untuk kotak
+    borderRadius: 12, // Sudut membulat
+    overflow: 'hidden', // Memastikan konten tidak keluar dari batas sudut membulat
   },
   img: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 12,
+    width: '100%', // Lebar gambar 100% dari kotak
+    height: '100%', // Tinggi gambar 100% dari kotak
+    borderRadius: 12, // Sudut membulat untuk gambar
   },
   blokError: {
-    flex: 1,
-    backgroundColor: '#ffbaba',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12,
+    flex: 1, // Mengisi seluruh ruang dalam kotak
+    backgroundColor: '#ffbaba', // Warna latar belakang untuk blok error
+    justifyContent: 'center', // Pusatkan teks secara vertikal
+    alignItems: 'center', // Pusatkan teks secara horizontal
+    borderRadius: 12, // Sudut membulat
   },
   teks: {
-    color: '#a30000',
-    fontWeight: '600',
-    fontSize: 13,
+    color: '#a30000', // Warna teks merah gelap
+    fontWeight: '600', // Ketebalan font
+    fontSize: 13, // Ukuran font
   },
 });
