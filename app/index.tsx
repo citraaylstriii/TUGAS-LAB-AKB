@@ -1,62 +1,121 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Image, TouchableOpacity, SafeAreaView, ScrollView, Dimensions, Text, StyleSheet } from 'react-native';
 
-export default function TampilanBangunRuang() {
+const SUMBER_FOTO = [
+  'https://images.pexels.com/photos/17685535/pexels-photo-17685535.jpeg',
+  'https://images.pexels.com/photos/322311/pexels-photo-322311.jpeg',
+  'https://images.pexels.com/photos/17685539/pexels-photo-17685539.jpeg',
+  'https://images.pexels.com/photos/19453661/pexels-photo-19453661.jpeg',
+  'https://images.pexels.com/photos/19453660/pexels-photo-19453660.jpeg',
+  'https://images.pexels.com/photos/16959472/pexels-photo-16959472.jpeg',
+  'https://images.pexels.com/photos/26791472/pexels-photo-26791472.jpeg',
+  'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg', // Tambahan gambar ke-8
+  'https://images.pexels.com/photos/34950/pexels-photo.jpg', // Tambahan gambar ke-9
+];
+
+const KUMPULAN = SUMBER_FOTO.map((tautan, i) => ({
+  kode: i + 1,
+  utama: tautan,
+  fallback: tautan,
+}));
+
+type ObjekGambar = {
+  kode: number;
+  utama: string;
+  fallback: string;
+};
+
+const KartuFoto = ({ data }: { data: ObjekGambar }) => {
+  const [pakaiFallback, setPakaiFallback] = useState(false);
+  const [perbesar, setPerbesar] = useState(1);
+  const [tidakTerload, setTidakTerload] = useState(false);
+
+  const ketikaTekan = () => {
+    if (tidakTerload) return;
+    setPakaiFallback(prev => !prev);
+    setPerbesar(prev => Math.min(prev * 1.15, 2));
+  };
+
+  const aktifUrl = pakaiFallback ? data.fallback : data.utama;
+
   return (
-    <View style={gayaRupa.latarTengah}>
-      <View style={gayaRupa.segitigaMeruncing} />
+    <TouchableOpacity onPress={ketikaTekan} style={gayaKartu.kotak}>
+      {tidakTerload ? (
+        <View style={gayaKartu.blokError}>
+          <Text style={gayaKartu.teks}>Gagal Tampil</Text>
+        </View>
+      ) : (
+        <Image
+          source={{ uri: aktifUrl }}
+          onError={() => setTidakTerload(true)}
+          style={[gayaKartu.img, { transform: [{ scale: perbesar }] }]}
+        />
+      )}
+    </TouchableOpacity>
+  );
+};
 
-      <View style={gayaRupa.kotakTeks}>
-        <Text style={gayaRupa.tulisanUtama}>ANDI CITRA AYU LESTARI</Text>
-      </View>
+export default function SusunanFoto() {
+  const layarLebar = Dimensions.get('window').width;
+  const ukuranFoto = layarLebar / 3 - 12;
 
-      <View style={gayaRupa.kapsulIdentitas}>
-        <Text style={gayaRupa.tulisanUtama}>105841101722</Text>
-      </View>
-    </View>
+  const potongBaris = (array: ObjekGambar[], awal: number) => array.slice(awal, awal + 3);
+
+  return (
+    <SafeAreaView style={gayaKartu.root}>
+      <ScrollView contentContainerStyle={gayaKartu.scroll}>
+        {[0, 3, 6].map(barisIndex => (
+          <View key={barisIndex} style={gayaKartu.lajur}>
+            {potongBaris(KUMPULAN, barisIndex).map(item => (
+              <View key={item.kode} style={[gayaKartu.peti, { width: ukuranFoto, height: ukuranFoto }]}>
+                <KartuFoto data={item} />
+              </View>
+            ))}
+          </View>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
-const gayaRupa = StyleSheet.create({
-  latarTengah: {
+const gayaKartu = StyleSheet.create({
+  root: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#121212',
+  },
+  scroll: {
+    paddingVertical: 18,
     alignItems: 'center',
-    gap: 28,
-    backgroundColor: '#0000FF', // Warna pastel biru
   },
-  segitigaMeruncing: {
-    width: 0,
-    height: 0,
-    backgroundColor: 'transparent',
-    borderLeftWidth: 65,
-    borderRightWidth: 65,
-    borderBottomWidth: 100,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor: '#ff6f61', // Coral pink
+  lajur: {
+    flexDirection: 'row',
+    marginBottom: 14,
   },
-  kotakTeks: {
-    width: 270,
-    height: 64,
-    backgroundColor: '#6a4c93', // Ungu tua
+  peti: {
+    marginHorizontal: 6,
+  },
+  kotak: {
+    flex: 1,
+    aspectRatio: 1,
+    backgroundColor: '#292929',
     borderRadius: 12,
+    overflow: 'hidden',
+  },
+  img: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 12,
+  },
+  blokError: {
+    flex: 1,
+    backgroundColor: '#ffbaba',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    borderRadius: 12,
   },
-  kapsulIdentitas: {
-    width: 270,
-    height: 64,
-    backgroundColor: '#0ca678', // Warna hijau emerald
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  tulisanUtama: {
-    color: '#fefefe',
-    fontSize: 16,
-    fontWeight: '700',
+  teks: {
+    color: '#a30000',
+    fontWeight: '600',
+    fontSize: 13,
   },
 });
