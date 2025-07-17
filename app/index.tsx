@@ -97,7 +97,7 @@ const ImageCell = ({ imageData }: { imageData: ImageData }) => {
         <Image
           key={activeImageUrl}
           source={{ uri: activeImageUrl }}
-          onError={() => setLoadError(true)}
+          onError={() => setLoadError(true)} // Menangani kesalahan pemuatan gambar
           style={[appStyles.responsiveImage, { transform: [{ scale: currentScale }] }]}
           resizeMode="contain" // Menghindari pemotongan gambar
         />
