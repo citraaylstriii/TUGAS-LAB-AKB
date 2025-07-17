@@ -122,7 +122,7 @@ export default function VisualGallery() {
           {PHOTO_DATA_SET.map((itemData) => (
             <View
               key={itemData.uniqueId}
-              style={[appStyles.gridCell, { width: cellSize, height: cellSize }]} // Menjaga ukuran sel agar sama
+              style={[appStyles.gridCell, { flexBasis: cellSize, height: cellSize }]} // Menjaga ukuran sel agar sama
             >
               <ImageCell imageData={itemData} />
             </View>
@@ -170,4 +170,7 @@ const appStyles = StyleSheet.create({
   },
   errorText: {
     color: '#a30000', // Teks merah gelap untuk error
-    fontWeight:
+    fontWeight: '600',
+    fontSize: 13,
+  },
+});
