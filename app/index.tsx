@@ -16,7 +16,7 @@ const SUMBER_FOTO = [
 const KUMPULAN = SUMBER_FOTO.map((tautan, i) => ({
   kode: i + 1,
   utama: tautan,
-  fallback: tautan,
+  fallback: tautan, // Gambar alternatif bisa disesuaikan dengan URL berbeda
 }));
 
 type ObjekGambar = {
@@ -32,8 +32,9 @@ const KartuFoto = ({ data }: { data: ObjekGambar }) => {
 
   const ketikaTekan = () => {
     if (tidakTerload) return;
-    setPakaiFallback(prev => !prev);
-    setPerbesar(prev => Math.min(prev * 1.15, 2));
+
+    // Perbesar gambar 1.2x, maksimal 2x
+    setPerbesar(prev => Math.min(prev * 1.2, 2));
   };
 
   const aktifUrl = pakaiFallback ? data.fallback : data.utama;
