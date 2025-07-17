@@ -9,8 +9,8 @@ const SUMBER_FOTO = [
   'https://images.pexels.com/photos/19453660/pexels-photo-19453660.jpeg',
   'https://images.pexels.com/photos/16959472/pexels-photo-16959472.jpeg',
   'https://images.pexels.com/photos/26791472/pexels-photo-26791472.jpeg',
-  'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg', // Tambahan gambar ke-8
-  'https://images.pexels.com/photos/34950/pexels-photo.jpg', // Tambahan gambar ke-9
+  'https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg',
+  'https://images.pexels.com/photos/34950/pexels-photo.jpg',
 ];
 
 const KUMPULAN = SUMBER_FOTO.map((tautan, i) => ({
@@ -57,7 +57,7 @@ const KartuFoto = ({ data }: { data: ObjekGambar }) => {
 
 export default function SusunanFoto() {
   const layarLebar = Dimensions.get('window').width;
-  const ukuranFoto = layarLebar / 3 - 12;
+  const ukuranFoto = layarLebar / 3 - 12;  // Ukuran gambar disesuaikan dengan lebar layar
 
   const potongBaris = (array: ObjekGambar[], awal: number) => array.slice(awal, awal + 3);
 
@@ -96,7 +96,7 @@ const gayaKartu = StyleSheet.create({
   },
   kotak: {
     flex: 1,
-    aspectRatio: 1,
+    aspectRatio: 1,  // Memastikan kotak tetap berbentuk persegi
     backgroundColor: '#292929',
     borderRadius: 12,
     overflow: 'hidden',
