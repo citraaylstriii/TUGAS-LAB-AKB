@@ -57,7 +57,7 @@ const ImageCell = ({ imageData }) => {
     // Meningkatkan penskalaan 1.2x per klik dan membatasi hingga 2x
     setCurrentScale(prevScale => {
       const nextScale = prevScale * 1.2; // Meningkatkan penskalaan 1.2x per klik
-      return nextScale >= 2 ? 1 : nextScale; // Reset ke ukuran 1x setelah mencapai 2x
+      return nextScale >= 2 ? 2 : nextScale; // Batasi skala maksimal menjadi 2x
     });
   };
 
@@ -92,4 +92,38 @@ export default function VisualGallery() {
             </View>
           ))}
         </View>
-      </ScrollVie
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+// Gaya aplikasi
+const styles = StyleSheet.create({
+  mainWrapper: {
+    flex: 1,
+    backgroundColor: '#111', // Latar belakang gelap untuk kontras gambar
+  },
+  scrollContent: {
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  imageGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center', // Memastikan semua gambar ditempatkan dengan rapi
+  },
+  gridCell: {
+    margin: 6, // Margin di sekitar setiap sel gambar
+    backgroundColor: '#222', // Latar belakang sel
+    borderRadius: 10, // Sudut gambar membulat
+    overflow: 'hidden', // Memastikan gambar tidak meluap keluar
+  },
+  imageContainer: {
+    flex: 1, // Mengisi seluruh ruang sel
+  },
+  responsiveImage: {
+    width: '100%', // Lebar gambar menyesuaikan lebar sel
+    height: '100%', // Tinggi gambar menyesuaikan tinggi sel
+    borderRadius: 10, // Sudut gambar membulat
+  },
+});
