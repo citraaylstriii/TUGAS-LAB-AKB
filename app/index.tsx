@@ -95,15 +95,11 @@ const ImageCell = ({ imageData }: { imageData: ImageData }) => {
       ) : (
         // Tampilan gambar utama
         <Image
-          // Menggunakan 'key' prop untuk memaksa React me-render ulang komponen Image
-          // setiap kali 'activeImageUrl' berubah, memastikan gambar baru dimuat.
           key={activeImageUrl}
           source={{ uri: activeImageUrl }}
-          // Callback jika terjadi kesalahan saat memuat gambar
           onError={() => setLoadError(true)}
-          // Menerapkan gaya gambar, termasuk transformasi skala
-          style={[appStyles.responsiveImage, { transform: [{ scale: currentScale }] }] }
-          resizeMode="contain" // Memastikan gambar tidak terpotong dan tetap sepenuhnya terlihat dalam sel
+          style={[appStyles.responsiveImage, { transform: [{ scale: currentScale }] }]}
+          resizeMode="contain" // Menghindari pemotongan gambar
         />
       )}
     </TouchableOpacity>
@@ -112,13 +108,11 @@ const ImageCell = ({ imageData }: { imageData: ImageData }) => {
 
 // Komponen utama aplikasi galeri foto
 export default function VisualGallery() {
-  // Mendapatkan lebar layar perangkat untuk perhitungan ukuran sel
   const deviceWidth = Dimensions.get('window').width;
 
-  // Menghitung ukuran setiap sel gambar agar membentuk grid 3x3 yang seragam.
-  // Total margin horizontal yang mempengaruhi lebar gambar (6px di kiri dan kanan untuk setiap item)
-  const totalHorizontalMargin = 6 * 2 * 3; // 6px (left+right) * 2 sides * 3 items
-  const cellSize = (deviceWidth - totalHorizontalMargin) / 3; // Menghitung ukuran sel gambar agar sama
+  // Ukuran setiap gambar dalam grid 3x3
+  const totalHorizontalMargin = 6 * 2 * 3; // Total margin horizontal untuk 3 gambar
+  const cellSize = (deviceWidth - totalHorizontalMargin) / 3; // Menghitung ukuran sel agar sama
 
   return (
     <SafeAreaView style={appStyles.mainWrapper}>
@@ -128,8 +122,7 @@ export default function VisualGallery() {
           {PHOTO_DATA_SET.map((itemData) => (
             <View
               key={itemData.uniqueId}
-              // Menerapkan ukuran yang dihitung secara dinamis untuk setiap sel
-              style={[appStyles.gridCell, { width: cellSize, height: cellSize }]}
+              style={[appStyles.gridCell, { width: cellSize, height: cellSize }]} // Menjaga ukuran sel agar sama
             >
               <ImageCell imageData={itemData} />
             </View>
@@ -177,7 +170,4 @@ const appStyles = StyleSheet.create({
   },
   errorText: {
     color: '#a30000', // Teks merah gelap untuk error
-    fontWeight: '600',
-    fontSize: 13,
-  },
-});
+    fontWeight:
