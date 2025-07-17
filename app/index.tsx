@@ -9,7 +9,7 @@ import {
   StyleSheet,
 } from 'react-native';
 
-// Daftar URL gambar utama dan alternatif
+// Kumpulan URL untuk gambar utama dan alternatif
 const PRIMARY_PHOTO_SOURCES = [
   'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg',
   'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
@@ -34,19 +34,19 @@ const SECONDARY_PHOTO_SOURCES = [
   'https://images.pexels.com/photos/213399/pexels-photo-213399.jpeg',
 ];
 
-// Menggabungkan gambar utama dan alternatif menjadi satu set data
+// Menggabungkan gambar utama dan alternatif
 const PHOTO_DATA_SET = PRIMARY_PHOTO_SOURCES.map((primaryUrl, idx) => ({
   uniqueId: idx,
   primaryUrl,
   alternateUrl: SECONDARY_PHOTO_SOURCES[idx] || primaryUrl,
 }));
 
-// Komponen untuk menampilkan sel gambar
+// Komponen untuk menampilkan gambar dalam sel
 const ImageCell = ({ imageData }) => {
-  const [isAlternateActive, setAlternateActive] = useState(false); // Untuk mengganti gambar utama dan alternatif
-  const [currentScale, setCurrentScale] = useState(1); // Untuk mengatur penskalaan gambar
+  const [isAlternateActive, setAlternateActive] = useState(false); // Menentukan apakah gambar alternatif aktif
+  const [currentScale, setCurrentScale] = useState(1); // Menyimpan skala gambar
 
-  // Menentukan URL gambar yang aktif (utama atau alternatif)
+  // Menentukan URL gambar yang aktif
   const activeImageUrl = isAlternateActive ? imageData.alternateUrl : imageData.primaryUrl;
 
   // Fungsi untuk menangani klik pada gambar
@@ -56,8 +56,8 @@ const ImageCell = ({ imageData }) => {
 
     // Meningkatkan penskalaan 1.2x per klik dan membatasi hingga 2x
     setCurrentScale(prevScale => {
-      const nextScale = prevScale * 1.2; // Meningkatkan penskalaan 1.2x per klik
-      return nextScale >= 2 ? 2 : nextScale; // Batasi skala maksimal menjadi 2x
+      const nextScale = prevScale * 1.2; // Meningkatkan penskalaan
+      return nextScale >= 2 ? 2 : nextScale; // Batasi penskalaan maksimum 2x
     });
   };
 
@@ -73,20 +73,20 @@ const ImageCell = ({ imageData }) => {
   );
 };
 
-// Komponen utama aplikasi galeri foto
+// Komponen utama untuk menampilkan gallery
 export default function VisualGallery() {
   const deviceWidth = Dimensions.get('window').width;
-  const cellSize = (deviceWidth - 18) / 3; // Ukuran sel gambar (menghitung lebar dengan margin 6px)
+  const cellSize = (deviceWidth - 18) / 3; // Menghitung ukuran sel untuk grid 3x3
 
   return (
     <SafeAreaView style={styles.mainWrapper}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.imageGrid}>
-          {/* Mengiterasi data gambar untuk menampilkan grid */}
+          {/* Mengiterasi dan menampilkan gambar dalam grid 3x3 */}
           {PHOTO_DATA_SET.map((itemData) => (
             <View
               key={itemData.uniqueId}
-              style={[styles.gridCell, { width: cellSize, height: cellSize }]} // Memastikan setiap sel gambar memiliki ukuran yang sama
+              style={[styles.gridCell, { width: cellSize, height: cellSize }]} // Menyusun sel gambar dengan ukuran seragam
             >
               <ImageCell imageData={itemData} />
             </View>
@@ -110,20 +110,20 @@ const styles = StyleSheet.create({
   imageGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center', // Memastikan semua gambar ditempatkan dengan rapi
+    justifyContent: 'center', // Menyusun gambar dalam 3 kolom
   },
   gridCell: {
-    margin: 6, // Margin di sekitar setiap sel gambar
-    backgroundColor: '#222', // Latar belakang sel
-    borderRadius: 10, // Sudut gambar membulat
-    overflow: 'hidden', // Memastikan gambar tidak meluap keluar
+    margin: 6, // Memberikan margin di sekitar setiap gambar
+    backgroundColor: '#222', // Latar belakang sel gambar
+    borderRadius: 10, // Membuat sudut sel membulat
+    overflow: 'hidden', // Memastikan gambar tidak keluar dari batas sel
   },
   imageContainer: {
-    flex: 1, // Mengisi seluruh ruang sel
+    flex: 1, // Menyesuaikan ukuran gambar dengan ukuran sel
   },
   responsiveImage: {
-    width: '100%', // Lebar gambar menyesuaikan lebar sel
-    height: '100%', // Tinggi gambar menyesuaikan tinggi sel
-    borderRadius: 10, // Sudut gambar membulat
+    width: '100%', // Mengisi seluruh lebar sel
+    height: '100%', // Mengisi seluruh tinggi sel
+    borderRadius: 10, // Membuat sudut gambar membulat
   },
 });
