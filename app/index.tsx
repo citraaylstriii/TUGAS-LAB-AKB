@@ -7,7 +7,6 @@ import {
   ScrollView,
   Dimensions,
   StyleSheet,
-  Text,
 } from 'react-native';
 
 // Daftar URL gambar utama dan alternatif
@@ -43,22 +42,22 @@ const PHOTO_DATA_SET = PRIMARY_PHOTO_SOURCES.map((primaryUrl, idx) => ({
 }));
 
 // Komponen untuk menampilkan sel gambar
-const ImageCell = ({ imageData }: { imageData: { uniqueId: number; primaryUrl: string; alternateUrl: string } }) => {
-  const [isAlternateActive, setAlternateActive] = useState(false); // Menangani pergantian gambar utama ke alternatif
-  const [currentScale, setCurrentScale] = useState(1); // Menangani penskalaan gambar
+const ImageCell = ({ imageData }) => {
+  const [isAlternateActive, setAlternateActive] = useState(false); // Untuk mengganti gambar utama dan alternatif
+  const [currentScale, setCurrentScale] = useState(1); // Untuk mengatur penskalaan gambar
 
   // Menentukan URL gambar yang aktif (utama atau alternatif)
   const activeImageUrl = isAlternateActive ? imageData.alternateUrl : imageData.primaryUrl;
 
   // Fungsi untuk menangani klik pada gambar
   const handleCellPress = () => {
-    // Mengalihkan gambar utama ke gambar alternatif
+    // Mengalihkan antara gambar utama dan alternatif
     setAlternateActive(prev => !prev);
 
     // Meningkatkan penskalaan 1.2x per klik dan membatasi hingga 2x
     setCurrentScale(prevScale => {
       const nextScale = prevScale * 1.2; // Meningkatkan penskalaan 1.2x per klik
-      return nextScale >= 2 ? 1 : nextScale; // Batas skala maksimum 2x, reset ke 1x jika melebihi
+      return nextScale >= 2 ? 1 : nextScale; // Reset ke ukuran 1x setelah mencapai 2x
     });
   };
 
@@ -67,7 +66,7 @@ const ImageCell = ({ imageData }: { imageData: { uniqueId: number; primaryUrl: s
       <Image
         key={activeImageUrl}
         source={{ uri: activeImageUrl }}
-        style={[styles.responsiveImage, { transform: [{ scale: currentScale }] }]} // Menambahkan penskalaan pada gambar
+        style={[styles.responsiveImage, { transform: [{ scale: currentScale }] }]} // Menerapkan penskalaan
         resizeMode="cover"
       />
     </TouchableOpacity>
@@ -77,7 +76,7 @@ const ImageCell = ({ imageData }: { imageData: { uniqueId: number; primaryUrl: s
 // Komponen utama aplikasi galeri foto
 export default function VisualGallery() {
   const deviceWidth = Dimensions.get('window').width;
-  const cellSize = (deviceWidth - 18) / 3; // Ukuran sel gambar (3 kolom dengan margin 6px di setiap sisi)
+  const cellSize = (deviceWidth - 18) / 3; // Ukuran sel gambar (menghitung lebar dengan margin 6px)
 
   return (
     <SafeAreaView style={styles.mainWrapper}>
@@ -87,7 +86,7 @@ export default function VisualGallery() {
           {PHOTO_DATA_SET.map((itemData) => (
             <View
               key={itemData.uniqueId}
-              style={[styles.gridCell, { width: cellSize, height: cellSize }]} // Memastikan sel gambar memiliki ukuran yang sama
+              style={[styles.gridCell, { width: cellSize, height: cellSize }]} // Memastikan setiap sel gambar memiliki ukuran yang sama
             >
               <ImageCell imageData={itemData} />
             </View>
