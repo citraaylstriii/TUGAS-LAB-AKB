@@ -44,8 +44,8 @@ const PHOTO_DATA_SET = PRIMARY_PHOTO_SOURCES.map((primaryUrl, idx) => ({
 
 // Komponen untuk menampilkan sel gambar
 const ImageCell = ({ imageData }: { imageData: { uniqueId: number; primaryUrl: string; alternateUrl: string } }) => {
-  const [isAlternateActive, setAlternateActive] = useState(false);
-  const [currentScale, setCurrentScale] = useState(1);
+  const [isAlternateActive, setAlternateActive] = useState(false); // Menangani pergantian gambar utama ke alternatif
+  const [currentScale, setCurrentScale] = useState(1); // Menangani penskalaan gambar
 
   // Menentukan URL gambar yang aktif (utama atau alternatif)
   const activeImageUrl = isAlternateActive ? imageData.alternateUrl : imageData.primaryUrl;
@@ -67,7 +67,7 @@ const ImageCell = ({ imageData }: { imageData: { uniqueId: number; primaryUrl: s
       <Image
         key={activeImageUrl}
         source={{ uri: activeImageUrl }}
-        style={[styles.responsiveImage, { transform: [{ scale: currentScale }] }]} // Menambahkan penskalaan
+        style={[styles.responsiveImage, { transform: [{ scale: currentScale }] }]} // Menambahkan penskalaan pada gambar
         resizeMode="cover"
       />
     </TouchableOpacity>
@@ -102,7 +102,7 @@ export default function VisualGallery() {
 const styles = StyleSheet.create({
   mainWrapper: {
     flex: 1,
-    backgroundColor: '#111',
+    backgroundColor: '#111', // Latar belakang gelap untuk kontras gambar
   },
   scrollContent: {
     alignItems: 'center',
@@ -111,20 +111,20 @@ const styles = StyleSheet.create({
   imageGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
+    justifyContent: 'center', // Memastikan semua gambar ditempatkan dengan rapi
   },
   gridCell: {
     margin: 6, // Margin di sekitar setiap sel gambar
-    backgroundColor: '#222',
-    borderRadius: 10,
-    overflow: 'hidden',
+    backgroundColor: '#222', // Latar belakang sel
+    borderRadius: 10, // Sudut gambar membulat
+    overflow: 'hidden', // Memastikan gambar tidak meluap keluar
   },
   imageContainer: {
-    flex: 1,
+    flex: 1, // Mengisi seluruh ruang sel
   },
   responsiveImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 10,
+    width: '100%', // Lebar gambar menyesuaikan lebar sel
+    height: '100%', // Tinggi gambar menyesuaikan tinggi sel
+    borderRadius: 10, // Sudut gambar membulat
   },
 });
