@@ -52,9 +52,12 @@ const ImageCell = ({ imageData }: { imageData: { uniqueId: number; primaryUrl: s
 
   // Fungsi untuk menangani klik pada gambar
   const handleCellPress = () => {
+    // Mengalihkan gambar utama ke gambar alternatif
     setAlternateActive(prev => !prev);
+
+    // Meningkatkan penskalaan 1.2x per klik dan membatasi hingga 2x
     setCurrentScale(prevScale => {
-      const nextScale = prevScale * 1.2; // Meningkatkan skala 1.2x per klik
+      const nextScale = prevScale * 1.2; // Meningkatkan penskalaan 1.2x per klik
       return nextScale >= 2 ? 1 : nextScale; // Batas skala maksimum 2x, reset ke 1x jika melebihi
     });
   };
