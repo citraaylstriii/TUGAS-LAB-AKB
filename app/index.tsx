@@ -7,10 +7,10 @@ import {
   ScrollView,
   Dimensions,
   StyleSheet,
-  Text, // Menambahkan Text untuk pesan error
+  Text,
 } from 'react-native';
 
-// Kumpulan URL untuk gambar utama yang akan ditampilkan
+// Daftar URL gambar utama dan alternatif
 const PRIMARY_PHOTO_SOURCES = [
   'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg',
   'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
@@ -23,7 +23,6 @@ const PRIMARY_PHOTO_SOURCES = [
   'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg',
 ];
 
-// Kumpulan URL untuk gambar alternatif yang akan muncul saat diklik
 const SECONDARY_PHOTO_SOURCES = [
   'https://images.pexels.com/photos/221540/pexels-photo-221540.jpeg',
   'https://images.pexels.com/photos/415687/pexels-photo-415687.jpeg',
@@ -36,72 +35,38 @@ const SECONDARY_PHOTO_SOURCES = [
   'https://images.pexels.com/photos/213399/pexels-photo-213399.jpeg',
 ];
 
-// Menggabungkan daftar gambar utama dan alternatif menjadi satu set data
+// Menggabungkan gambar utama dan alternatif menjadi satu set data
 const PHOTO_DATA_SET = PRIMARY_PHOTO_SOURCES.map((primaryUrl, idx) => ({
-  uniqueId: idx, // Pengenal unik untuk setiap entri
-  primaryUrl,     // URL gambar utama
-  alternateUrl: SECONDARY_PHOTO_SOURCES[idx] || primaryUrl, // URL gambar alternatif, fallback ke utama jika tidak ada
+  uniqueId: idx,
+  primaryUrl,
+  alternateUrl: SECONDARY_PHOTO_SOURCES[idx] || primaryUrl,
 }));
 
-// Definisi tipe untuk objek data gambar
-type ImageData = {
-  uniqueId: number;
-  primaryUrl: string;
-  alternateUrl: string;
-};
-
-// Komponen individual untuk menampilkan setiap sel gambar dalam galeri
-const ImageCell = ({ imageData }: { imageData: ImageData }) => {
-  // State untuk melacak apakah gambar alternatif sedang aktif
+// Komponen untuk menampilkan sel gambar
+const ImageCell = ({ imageData }: { imageData: { uniqueId: number; primaryUrl: string; alternateUrl: string } }) => {
   const [isAlternateActive, setAlternateActive] = useState(false);
-  // State untuk mengontrol faktor penskalaan gambar
   const [currentScale, setCurrentScale] = useState(1);
-  // State untuk menangani kesalahan pemuatan gambar
-  const [hasLoadError, setLoadError] = useState(false);
 
-  // Menentukan URL gambar yang sedang aktif (utama atau alternatif)
+  // Menentukan URL gambar yang aktif (utama atau alternatif)
   const activeImageUrl = isAlternateActive ? imageData.alternateUrl : imageData.primaryUrl;
 
-  // Fungsi yang dipanggil saat sel gambar ditekan
+  // Fungsi untuk menangani klik pada gambar
   const handleCellPress = () => {
-    // Jika ada kesalahan pemuatan, abaikan interaksi
-    if (hasLoadError) return;
-
-    // Mengalihkan antara gambar utama dan alternatif
     setAlternateActive(prev => !prev);
-
-    // Menerapkan penskalaan gambar:
-    // Setiap klik akan meningkatkan skala sebesar 1.2x.
-    // Skala maksimum dibatasi hingga 2x.
-    // Jika skala sudah mencapai atau melebihi 2x, skala akan direset ke 1 (normal).
     setCurrentScale(prevScale => {
-      const nextCalculatedScale = prevScale * 1.2; // Mengubah penskalaan menjadi 1.2x per klik
-      // Memastikan skala tidak melebihi 2x. Jika melebihi, atau jika sudah 2x, reset ke 1.
-      if (prevScale >= 2 || nextCalculatedScale > 2) {
-        return 1; // Reset ke skala awal
-      } else {
-        return nextCalculatedScale; // Terapkan skala baru
-      }
+      const nextScale = prevScale * 1.2; // Meningkatkan skala 1.2x per klik
+      return nextScale >= 2 ? 1 : nextScale; // Batas skala maksimum 2x, reset ke 1x jika melebihi
     });
   };
 
   return (
-    <TouchableOpacity onPress={handleCellPress} style={appStyles.imageContainer}>
-      {hasLoadError ? (
-        // Tampilan jika gambar gagal dimuat
-        <View style={appStyles.errorBlock}>
-          <Text style={appStyles.errorText}>Gagal Muat</Text>
-        </View>
-      ) : (
-        // Tampilan gambar utama
-        <Image
-          key={activeImageUrl}
-          source={{ uri: activeImageUrl }}
-          onError={() => setLoadError(true)} // Menangani kesalahan pemuatan gambar
-          style={[appStyles.responsiveImage, { transform: [{ scale: currentScale }] }]}
-          resizeMode="contain" // Menghindari pemotongan gambar
-        />
-      )}
+    <TouchableOpacity onPress={handleCellPress} style={styles.imageContainer}>
+      <Image
+        key={activeImageUrl}
+        source={{ uri: activeImageUrl }}
+        style={[styles.responsiveImage, { transform: [{ scale: currentScale }] }]} // Menambahkan penskalaan
+        resizeMode="cover"
+      />
     </TouchableOpacity>
   );
 };
@@ -109,20 +74,17 @@ const ImageCell = ({ imageData }: { imageData: ImageData }) => {
 // Komponen utama aplikasi galeri foto
 export default function VisualGallery() {
   const deviceWidth = Dimensions.get('window').width;
-
-  // Ukuran setiap gambar dalam grid 3x3
-  const totalHorizontalMargin = 6 * 2 * 3; // Total margin horizontal untuk 3 gambar
-  const cellSize = (deviceWidth - totalHorizontalMargin) / 3; // Menghitung ukuran sel agar sama
+  const cellSize = (deviceWidth - 18) / 3; // Ukuran sel gambar (3 kolom dengan margin 6px di setiap sisi)
 
   return (
-    <SafeAreaView style={appStyles.mainWrapper}>
-      <ScrollView contentContainerStyle={appStyles.scrollContent}>
-        <View style={appStyles.imageGrid}>
-          {/* Mengiterasi melalui set data gambar untuk membuat setiap sel */}
+    <SafeAreaView style={styles.mainWrapper}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.imageGrid}>
+          {/* Mengiterasi data gambar untuk menampilkan grid */}
           {PHOTO_DATA_SET.map((itemData) => (
             <View
               key={itemData.uniqueId}
-              style={[appStyles.gridCell, { flexBasis: cellSize, height: cellSize }]} // Menjaga ukuran sel agar sama
+              style={[styles.gridCell, { width: cellSize, height: cellSize }]} // Memastikan sel gambar memiliki ukuran yang sama
             >
               <ImageCell imageData={itemData} />
             </View>
@@ -133,44 +95,33 @@ export default function VisualGallery() {
   );
 }
 
-// Objek StyleSheet untuk mendefinisikan gaya-gaya komponen aplikasi
-const appStyles = StyleSheet.create({
+// Gaya aplikasi
+const styles = StyleSheet.create({
   mainWrapper: {
-    flex: 1, // Memastikan komponen mengisi seluruh ruang layar
-    backgroundColor: '#111', // Warna latar belakang gelap
+    flex: 1,
+    backgroundColor: '#111',
   },
   scrollContent: {
-    alignItems: 'center', // Memusatkan konten secara horizontal dalam ScrollView
-    paddingVertical: 20, // Padding vertikal untuk area scroll
+    alignItems: 'center',
+    paddingVertical: 20,
   },
   imageGrid: {
-    flexDirection: 'row', // Mengatur item dalam baris
-    flexWrap: 'wrap',     // Memungkinkan item untuk melipat ke baris berikutnya
-    justifyContent: 'center', // Memusatkan baris jika ada sisa ruang
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
   },
   gridCell: {
     margin: 6, // Margin di sekitar setiap sel gambar
-    backgroundColor: '#222', // Warna latar belakang sel
-    borderRadius: 10, // Sudut membulat untuk sel
+    backgroundColor: '#222',
+    borderRadius: 10,
+    overflow: 'hidden',
   },
   imageContainer: {
-    flex: 1, // Memastikan container gambar mengisi seluruh sel
+    flex: 1,
   },
   responsiveImage: {
-    width: '100%', // Lebar gambar 100% dari container-nya
-    height: '100%', // Tinggi gambar 100% dari container-nya
-    borderRadius: 10, // Sudut membulat untuk gambar itu sendiri
-  },
-  errorBlock: {
-    flex: 1,
-    backgroundColor: '#ffbaba', // Latar belakang merah muda untuk error
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: '100%',
+    height: '100%',
     borderRadius: 10,
-  },
-  errorText: {
-    color: '#a30000', // Teks merah gelap untuk error
-    fontWeight: '600',
-    fontSize: 13,
   },
 });
